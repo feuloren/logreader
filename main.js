@@ -7,6 +7,8 @@ var static = require('node-static');
 
 var file = new static.Server('./web', {cache: 6}); //cache en secondes
 
+var loadNbLines = 10;
+
 function handler (req, res) {
     if( req.url == '/') {
         file.serveFile('/index.html', 200, {}, req, res);
@@ -26,6 +28,17 @@ function followFile(socket, file) {
         socket.emit('cant follow', {reason: err.code, file: file});
         return;
     }
+    fs.readFile(file, {encoding: "utf-8"}, function(err, data) {
+        parts = data.split("\n");
+        len = parts.length;
+        if (len <= loadNbLines)
+            start = 0;
+        else
+            start = len - loadNbLines - 1;
+        for (i = start; i < len; i++) {
+            socket.emit('line', {file:file, data:parts[i]});
+        }
+    });
 
     tail.on("line", function(data) {
         socket.emit('line', {file:file, data:data});
