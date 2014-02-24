@@ -1,0 +1,14 @@
+{
+"name": "logreader",
+"version": "0.1",
+"author" : "Florent Thévenet <florent@fthevenet.fr>",
+"repository" :
+  { "type" : "git",
+    "url" : "http://github.com/feuloren/logreader.git"
+  },
+"dependencies" :
+  { "node-static" : "*",
+    "tail" : "*",
+    "socket.io" : "*"
+  }
+}
