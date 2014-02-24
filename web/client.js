@@ -21,28 +21,39 @@ socket.on('followed', function (data) {
         log.id = "a" + guid(); // avec un id aléatoire
         var id = '#' + log.id;
 
-        // On cache ce div si on suit déjà d'autres fichiers
-        if (activeFile !== undefined) {
-            log.style.diplay = "none";
-        } else {
-            activeFile = id;
-        }
-
         // on sauvegarde l'id et on ajoute le div au div principal
         followedFiles[data.file] = id;
         $('#logs').append(log);
 
         // on crée un bouton pour afficher ce fichier
-        var button = document.createElement('button');
+        var button = document.createElement('a');
+        button.href = "#" ;
+        button.title = data.file;
         // texte du bouton = nom du fichier
         button.innerHTML = data.file.split('/').pop();
         $(button).click(function() {
+            if (id == activeFile)
+                return;
             $(activeFile).hide();
             $(id).show();
+            $(id + '-button').addClass("pure-menu-selected");
+            $(activeFile + '-button').removeClass("pure-menu-selected");
             activeFile = id;
         });
 
-        $('#tabs').append(button);
+        li = document.createElement('li');
+        li.id = log.id + '-button';
+
+        // On cache ce div si on suit déjà d'autres fichiers
+        if (activeFile !== undefined) {
+            log.style.diplay = "none";
+        } else {
+            activeFile = id;
+            li.classList.add("pure-menu-selected");
+        }
+
+        li.appendChild(button);
+        $('#tabs').append(li);
     }
 });
 
