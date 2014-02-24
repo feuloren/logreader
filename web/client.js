@@ -72,7 +72,9 @@ socket.on('cant follow', function(data) {
 });
 
 $('#btn-add-file').click(function() {
-    socket.emit('follow', {file: $('#input-add-file').val()});
+    var file = $('#input-add-file').val();
+    if (followedFiles[file] === undefined)
+        socket.emit('follow', {file: file});
 });
 
 // fonction de génération d'uuid
