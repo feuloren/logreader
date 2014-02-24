@@ -1,6 +1,6 @@
 {
 "name": "logreader",
-"version": "0.1",
+"version": "0.0.2",
 "author" : "Florent Thévenet <florent@fthevenet.fr>",
 "repository" :
   { "type" : "git",
