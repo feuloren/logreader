@@ -245,3 +245,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 #menu {
     overflow-x: hidden;
 }
+
+#main {
+    padding-left: 7px;
+}
