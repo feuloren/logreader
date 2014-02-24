@@ -46,6 +46,20 @@ socket.on('followed', function (data) {
     }
 });
 
+// cant follow est emis si on ne peut pas suivre un fichier
+socket.on('cant follow', function(data) {
+    if (data.reason == 'ENOENT') {
+        reason = "File doesn't exist";
+    }
+    else if (data.reason == 'EACCES') {
+        reason = "Not allowed to read file";
+    }
+    else {
+        reason = "Unknown reason : " + data.reason;
+    }
+    alert("Can't follow " + data.file + " : " + reason);
+});
+
 $('#btn-add-file').click(function() {
     socket.emit('follow', {file: $('#input-add-file').val()});
 });

@@ -20,7 +20,12 @@ function handler (req, res) {
 app.listen(1337, '0.0.0.0');
 
 function followFile(socket, file) {
-    tail = new Tail(file);
+    try {
+        tail = new Tail(file);
+    } catch (err) {
+        socket.emit('cant follow', {reason: err.code, file: file});
+        return;
+    }
 
     tail.on("line", function(data) {
         socket.emit('line', {file:file, data:data});
