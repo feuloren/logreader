@@ -57,6 +57,8 @@ socket.on('followed', function (data) {
 
         li.appendChild(button);
         $('#tabs').append(li);
+
+        saveFiles();
     }
 });
 
@@ -88,6 +90,27 @@ $('#form-follow').submit(function() {
 $('#btn-cancel-add-file').click(function(e) {
     $('#dialog').hide();
     $('#btn-submit-add-file').removeClass("pure-menu-selected");
+});
+
+// fonctions de sauvegarde
+function saveFiles() {
+    var files = Object.keys(followedFiles);
+    localStorage.setItem("files", JSON.stringify(files));
+}
+
+function populateFiles() {
+    var filesJson = localStorage.getItem("files");
+    if (filesJson == null)
+        return;
+    var files = JSON.parse(filesJson);
+
+    for(var i = 0; i < files.length; i++) {
+        socket.emit('follow', {file: files[i]});
+    }
+}
+
+$(document).ready(function() {
+    populateFiles();
 });
 
 // fonction de génération d'uuid
