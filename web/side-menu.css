@@ -249,3 +249,13 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 #main {
     padding-left: 7px;
 }
+
+#dialog {
+    display: none;
+    padding: 10px;
+    margin: 0px auto 0px auto;
+    box-shadow: 2px 2px 3px rgba(10,10,10);
+    z-index: 200;
+    background-color: white;
+    position: fixed;
+}

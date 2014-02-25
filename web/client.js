@@ -16,6 +16,9 @@ socket.on('line', function (data) {
 // followed est émis quand on suit un nouveau fichier
 socket.on('followed', function (data) {
     if (followedFiles[data.file] === undefined) {
+        $('#dialog').hide();
+        $('#btn-add-file').removeClass("pure-menu-selected");
+
         // on crée un div qui va contenir les lignes de log
         var log = document.createElement("div");
         log.id = "a" + guid(); // avec un id aléatoire
@@ -72,9 +75,19 @@ socket.on('cant follow', function(data) {
 });
 
 $('#btn-add-file').click(function() {
+    $('#dialog').show();
+    $('#btn-add-file').addClass("pure-menu-selected");
+});
+
+$('#form-follow').submit(function() {
     var file = $('#input-add-file').val();
     if (followedFiles[file] === undefined)
         socket.emit('follow', {file: file});
+});
+
+$('#btn-cancel-add-file').click(function(e) {
+    $('#dialog').hide();
+    $('#btn-submit-add-file').removeClass("pure-menu-selected");
 });
 
 // fonction de génération d'uuid
