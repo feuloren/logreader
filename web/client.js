@@ -16,9 +16,6 @@ socket.on('line', function (data) {
 // followed est émis quand on suit un nouveau fichier
 socket.on('followed', function (data) {
     if (followedFiles[data.file] === undefined) {
-        $('#dialog').hide();
-        $('#btn-add-file').removeClass("pure-menu-selected");
-
         // on crée un div qui va contenir les lignes de log
         var log = document.createElement("div");
         log.id = "a" + guid(); // avec un id aléatoire
@@ -48,8 +45,8 @@ socket.on('followed', function (data) {
         li.id = log.id + '-button';
 
         // On cache ce div si on suit déjà d'autres fichiers
-        if (activeFile !== undefined) {
-            log.style.diplay = "none";
+        if(activeFile !== undefined) {
+            $(log).hide();
         } else {
             activeFile = id;
             li.classList.add("pure-menu-selected");
@@ -59,6 +56,13 @@ socket.on('followed', function (data) {
         $('#tabs').append(li);
 
         saveFiles();
+
+        // on récupère quelques lignes de la fin du fichier
+        // comme tail -f
+        socket.emit('prevlines', {file: data.file});
+
+        $('#dialog').hide();
+        $('#li-add-file').removeClass("pure-menu-selected");
     }
 });
 
@@ -78,7 +82,7 @@ socket.on('cant follow', function(data) {
 
 $('#btn-add-file').click(function() {
     $('#dialog').show();
-    $('#btn-add-file').addClass("pure-menu-selected");
+    $('#li-add-file').addClass("pure-menu-selected");
 });
 
 $('#form-follow').submit(function() {
@@ -89,7 +93,7 @@ $('#form-follow').submit(function() {
 
 $('#btn-cancel-add-file').click(function(e) {
     $('#dialog').hide();
-    $('#btn-submit-add-file').removeClass("pure-menu-selected");
+    $('#li-add-file').removeClass("pure-menu-selected");
 });
 
 // fonctions de sauvegarde

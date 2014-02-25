@@ -28,17 +28,6 @@ function followFile(socket, file) {
         socket.emit('cant follow', {reason: err.code, file: file});
         return;
     }
-    fs.readFile(file, {encoding: "utf-8"}, function(err, data) {
-        parts = data.split("\n");
-        len = parts.length;
-        if (len <= loadNbLines)
-            start = 0;
-        else
-            start = len - loadNbLines - 1;
-        for (i = start; i < len; i++) {
-            socket.emit('line', {file:file, data:parts[i]});
-        }
-    });
 
     tail.on("line", function(data) {
         socket.emit('line', {file:file, data:data});
@@ -47,8 +36,30 @@ function followFile(socket, file) {
     socket.emit('followed', {file: file});
 }
 
+function prevLines(socket, file) {
+    try {
+        fs.readFile(file, {encoding: "utf-8"}, function(err, data) {
+            parts = data.split("\n");
+            len = parts.length;
+            if (len <= loadNbLines)
+                start = 0;
+            else
+                start = len - loadNbLines - 1;
+            for (i = start; i < len; i++) {
+                socket.emit('line', {file:file, data:parts[i]});
+            }
+        });
+    } catch (err) {
+        return;
+    }
+}
+
 io.sockets.on('connection', function (socket) {
     socket.on('follow', function(data) {
         followFile(socket, data.file);
+    });
+
+    socket.on('prevlines', function(data) {
+        prevLines(socket, data.file);
     });
 });
