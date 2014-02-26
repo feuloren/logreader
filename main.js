@@ -48,7 +48,7 @@ function followFile(socket, file) {
 function prevLines(socket, file) {
     try {
         fs.readFile(file, {encoding: "utf-8"}, function(err, data) {
-            parts = data.split("\n");
+            parts = data.toString("utf-8").split("\n");
             len = parts.length;
             if (len <= loadNbLines)
                 start = 0;
