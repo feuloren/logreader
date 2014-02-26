@@ -4,6 +4,12 @@ var fs = require('fs');
 var util = require('util');
 var Tail = require('tail').Tail;
 var static = require('node-static');
+var stdio = require('stdio');
+
+var ops = stdio.getopt({
+    'port': {key: 'p', description: 'Port to listen on', args: 1},
+    'http_ip': {key: 'h', description: 'IP to server to', args: 1}
+});
 
 var file = new static.Server('./web', {cache: 6}); //cache en secondes
 
@@ -19,7 +25,10 @@ function handler (req, res) {
     }).resume();
 }
 
-app.listen(1337, '0.0.0.0');
+port = ops.port || 1337;
+ip = ops.http_ip || '127.0.0.1'
+app.listen(port, ip);
+console.log("Serving on %s:%s", ip, port);
 
 function followFile(socket, file) {
     try {
