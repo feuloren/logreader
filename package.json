@@ -9,6 +9,7 @@
 "dependencies" :
   { "node-static" : "*",
     "tail" : "*",
-    "socket.io" : "*"
+    "socket.io" : "*",
+    "stdio" : "*"
   }
 }
