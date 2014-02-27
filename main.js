@@ -1,5 +1,6 @@
 var app = require('http').createServer(handler);
-var io = require('socket.io').listen(app);
+var io = require('socket.io').listen(app)
+io.set('log level', 1);;
 var fs = require('fs');
 var util = require('util');
 var Tail = require('tail').Tail;
