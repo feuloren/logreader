@@ -35,7 +35,7 @@ function followFile(socket, file) {
         tail = new Tail(file);
     } catch (err) {
         socket.emit('cant follow', {reason: err.code, file: file});
-        return;
+        return false;
     }
 
     tail.on("line", function(data) {
@@ -43,6 +43,7 @@ function followFile(socket, file) {
     });
 
     socket.emit('followed', {file: file});
+    return tail;
 }
 
 function prevLines(socket, file) {
@@ -63,12 +64,44 @@ function prevLines(socket, file) {
     }
 }
 
+tails = {
+    hasTail: function(client, file) {
+        return this[client] !== undefined && this[client][file] !== undefined;
+    },
+    setTail: function(client, file, tail) {
+        if (this[client] === undefined) {
+            this[client] = {};
+        }
+        this[client][file] = tail;
+    },
+    stopTail: function(client, file) {
+        if (this.hasTail(client, file)) {
+            this[client][file].unwatch();
+            delete this[client][file];
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
 io.sockets.on('connection', function (socket) {
     socket.on('follow', function(data) {
-        followFile(socket, data.file);
+        if (!tails.hasTail(socket.id, data.file)) {
+            tail = followFile(socket, data.file);
+            if (tail !== false) {
+                tails.setTail(socket.id, data.file, tail);
+            }
+        }
     });
 
     socket.on('prevlines', function(data) {
         prevLines(socket, data.file);
+    });
+
+    socket.on('stop following', function(data) {
+        if (tails.stopTail(socket.id, data.file)) {
+            socket.emit('stopped following', {file: data.file});
+        }
     });
 });

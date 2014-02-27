@@ -3,6 +3,8 @@ var socket = io.connect('http://localhost');
 var followedFiles = {};
 var activeFile = undefined;
 
+/* ---------- Socket.io messages -------------- */
+
 // l'évènement line est émis quand une ligne est ajoutée à un fichier
 socket.on('line', function (data) {
     if (followedFiles[data.file] !== undefined) {
@@ -44,6 +46,20 @@ socket.on('followed', function (data) {
         li = document.createElement('li');
         li.id = log.id + '-button';
 
+        // on crée le div avec le bouton fermer
+        var close = document.createElement('div');
+        var aclose = document.createElement('a');
+        aclose.innerHTML = 'X';
+        aclose.title = "Stop following that file";
+        $(aclose).click(function() {
+            socket.emit('stop following', {file: data.file});
+            return false;
+        });
+        
+        $(close).addClass('close');
+        close.appendChild(aclose);
+        button.appendChild(close);
+
         // On cache ce div si on suit déjà d'autres fichiers
         if(activeFile !== undefined) {
             $(log).hide();
@@ -79,6 +95,32 @@ socket.on('cant follow', function(data) {
     }
     alert("Can't follow " + data.file + " : " + reason);
 });
+
+// stopped following est émis quand le serveur a arrêté de suivre un fichier
+socket.on('stopped following', function(data) {
+    var id = followedFiles[data.file];
+    if (id !== undefined) {
+        $(id).remove();
+        $(id+'-button').remove();
+        delete followedFiles[data.file];
+        saveFiles();
+
+        // on simule un click sur le premier fichier pour qu'il devienne actif
+        var buttons = $('#tabs li a');
+        // on ignore le bouton 'Follow new file'
+        if (buttons.length > 1) {
+            buttons[1].click();
+        } else {
+            // il ne reste plus de fichiers suivis sauf erreur
+            // on vérifie quand même
+            if (Object.keys(followedFiles).length == 0) {
+                activeFile = undefined;
+            }
+        }
+    }
+});
+
+/* ---------- DOM Events -------------- */
 
 $('#btn-add-file').click(function() {
     $('#dialog').show();
